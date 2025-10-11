@@ -7,14 +7,17 @@ interface FitScoreIndicatorProps {
 
 export const FitScoreIndicator = ({ score, className }: FitScoreIndicatorProps) => {
   const getScoreColor = (score: number) => {
-    if (score === 0) return "bg-muted text-muted-foreground";
+    if (score === 0) return "bg-[hsl(var(--score-red))] text-white";
+    if (score === 50) return "bg-[hsl(var(--score-orange))] text-white";
+    if (score === 100) return "bg-[hsl(var(--score-green))] text-white";
+    // For scores that aren't exactly 0, 50, or 100, use gradient based on proximity
     if (score < 50) return "bg-[hsl(var(--score-red))] text-white";
-    if (score < 75) return "bg-[hsl(var(--score-orange))] text-white";
+    if (score < 100) return "bg-[hsl(var(--score-orange))] text-white";
     return "bg-[hsl(var(--score-green))] text-white";
   };
 
   const getScoreLabel = (score: number) => {
-    if (score === 0) return "Not answered";
+    if (score === 0) return "0% fit";
     return `${Math.round(score)}% fit`;
   };
 

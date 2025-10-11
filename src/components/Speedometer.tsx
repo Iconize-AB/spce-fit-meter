@@ -11,8 +11,12 @@ export const Speedometer = ({ score }: SpeedometerProps) => {
   }, [score]);
 
   const getScoreColor = (score: number) => {
+    if (score === 0) return "hsl(var(--score-red))";
+    if (score === 50) return "hsl(var(--score-orange))";
+    if (score === 100) return "hsl(var(--score-green))";
+    // For scores that aren't exactly 0, 50, or 100, use gradient based on proximity
     if (score < 50) return "hsl(var(--score-red))";
-    if (score < 75) return "hsl(var(--score-orange))";
+    if (score < 100) return "hsl(var(--score-orange))";
     return "hsl(var(--score-green))";
   };
 
@@ -103,9 +107,11 @@ export const Speedometer = ({ score }: SpeedometerProps) => {
           You have got {Math.round(score)}% fit with SP_CE
         </p>
         <p className="text-sm text-muted-foreground mt-2">
-          {score < 50 && "Consider reviewing your responses to improve your fit score"}
-          {score >= 50 && score < 75 && "Good progress! You're on the right track"}
-          {score >= 75 && "Excellent fit! SP_CE is well-suited for your needs"}
+          {score === 0 && "Start answering questions to see your fit score"}
+          {score > 0 && score < 50 && "Lower fit - Consider reviewing your responses"}
+          {score === 50 && "Moderate fit - Good potential alignment"}
+          {score > 50 && score < 100 && "Good fit - Strong alignment with SP_CE"}
+          {score === 100 && "Perfect fit! SP_CE is ideally suited for your needs"}
         </p>
       </div>
     </div>
