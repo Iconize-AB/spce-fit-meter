@@ -17,19 +17,23 @@ export const QuestionItem = ({ question, value, score = 0, onChange }: QuestionI
     }
   };
 
+  // Filter out empty value options (placeholders)
+  const validOptions = question.options.filter(opt => opt.value !== "");
+  const placeholderText = question.options.find(opt => opt.value === "")?.label || "Select an option";
+
   return (
     <div className="flex items-center justify-between gap-4 py-3 border-b border-border last:border-0">
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-foreground">{question.text}</p>
       </div>
       <div className="flex items-center gap-3 flex-shrink-0">
-        <Select value={value || ""} onValueChange={handleChange}>
+        <Select value={value} onValueChange={handleChange}>
           <SelectTrigger className="w-[280px]">
-            <SelectValue placeholder="Select an option" />
+            <SelectValue placeholder={placeholderText} />
           </SelectTrigger>
           <SelectContent>
-            {question.options.map((option) => (
-              <SelectItem key={option.value} value={option.value} disabled={!option.value}>
+            {validOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>
             ))}
