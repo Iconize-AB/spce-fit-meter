@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { questionnaireData } from "@/data/questionnaireData";
 import { Answer } from "@/types/questionnaire";
 import { QuestionnaireSection } from "@/components/QuestionnaireSection";
-import { Speedometer } from "@/components/Speedometer";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Download } from "lucide-react";
 import jsPDF from "jspdf";
@@ -167,15 +166,34 @@ const Index = () => {
           ))}
         </div>
 
-        {/* Speedometer */}
+        {/* Score Display */}
         {answers.length > 0 && (
-          <div className="mt-12 bg-white rounded-xl border border-border p-8 shadow-lg">
-            <h2 className="text-2xl font-bold text-center text-foreground mb-2">
-              Your SP<span className="text-primary">_</span>CE Score
+          <div className="mt-12 bg-white rounded-xl border border-border p-12 shadow-lg">
+            <h2 className="text-2xl font-bold text-center text-foreground mb-8">
+              Your SP<span className="text-primary">_</span>CE Fit Score
             </h2>
-            <Speedometer score={totalScore} />
-            <div className="flex justify-center mt-6">
-              <Button onClick={handleDownloadPDF} size="lg" className="rounded-full">
+            <div className="flex flex-col items-center justify-center space-y-6">
+              <div
+                className="text-8xl font-bold"
+                style={{
+                  color:
+                    totalScore >= 67
+                      ? "hsl(var(--score-green))"
+                      : totalScore >= 35
+                      ? "hsl(var(--score-orange))"
+                      : "hsl(var(--score-red))",
+                }}
+              >
+                {Math.round(totalScore)}%
+              </div>
+              <p className="text-xl font-semibold text-foreground">
+                {totalScore >= 67
+                  ? "Excellent fit with SP_CE!"
+                  : totalScore >= 35
+                  ? "Good potential alignment with SP_CE"
+                  : "Lower fit - Consider reviewing your responses"}
+              </p>
+              <Button onClick={handleDownloadPDF} size="lg" className="rounded-full mt-4">
                 <Download className="mr-2 h-5 w-5" />
                 Download PDF Report
               </Button>
