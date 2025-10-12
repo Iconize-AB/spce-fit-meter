@@ -3,11 +3,13 @@ import { questionnaireData } from "@/data/questionnaireData";
 import { Answer } from "@/types/questionnaire";
 import { QuestionnaireSection } from "@/components/QuestionnaireSection";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import { RotateCcw, Download } from "lucide-react";
 import jsPDF from "jspdf";
 
 const Index = () => {
   const [answers, setAnswers] = useState<Answer[]>([]);
+  const [productivityGain, setProductivityGain] = useState<number>(10);
 
   const handleAnswerChange = (questionId: string, value: string, score: number) => {
     setAnswers((prev) => {
@@ -33,7 +35,34 @@ const Index = () => {
 
   const handleReset = () => {
     setAnswers([]);
+    setProductivityGain(10);
   };
+
+  // Calculate Partners/PAM ratio and potential savings
+  const partnersValue = answers.find(a => a.questionId === "partners")?.value;
+  const pamValue = answers.find(a => a.questionId === "pam_count")?.value;
+  
+  const calculatedMetrics = useMemo(() => {
+    if (!partnersValue || !pamValue) return null;
+    
+    const getNumericValue = (val: string): number => {
+      if (val.includes("+")) {
+        return parseInt(val.replace("+", ""));
+      }
+      const parts = val.split("-");
+      if (parts.length === 2) {
+        return (parseInt(parts[0]) + parseInt(parts[1])) / 2;
+      }
+      return parseInt(val);
+    };
+    
+    const partners = getNumericValue(partnersValue);
+    const pams = getNumericValue(pamValue);
+    const ratio = Math.round(partners / pams);
+    const potentialSavings = Math.round(pams * (productivityGain / 100) * 165);
+    
+    return { ratio, pams, potentialSavings };
+  }, [partnersValue, pamValue, productivityGain]);
 
   const handleDownloadPDF = () => {
     const pdf = new jsPDF();
@@ -168,32 +197,93 @@ const Index = () => {
 
         {/* Score Display */}
         {answers.length > 0 && (
-          <div className="mt-12 bg-white rounded-xl border border-border p-12 shadow-lg">
-            <h2 className="text-2xl font-bold text-center text-foreground mb-8">
-              Your SP<span className="text-primary">_</span>CE Fit Score
-            </h2>
-            <div className="flex flex-col items-center justify-center space-y-6">
-              <div
-                className="text-8xl font-bold"
-                style={{
-                  color:
-                    totalScore >= 67
-                      ? "hsl(var(--score-green))"
-                      : totalScore >= 35
-                      ? "hsl(var(--score-orange))"
-                      : "hsl(var(--score-red))",
-                }}
-              >
-                {Math.round(totalScore)}%
+          <div className="mt-12 space-y-8">
+            {/* Main Score */}
+            <div className="bg-white rounded-xl border-border border p-12 shadow-lg">
+              <h2 className="text-2xl font-bold text-center text-foreground mb-8">
+                Your SP<span className="text-primary">_</span>CE Fit Score
+              </h2>
+              <div className="flex flex-col items-center justify-center space-y-6">
+                <div
+                  className="text-8xl font-bold"
+                  style={{
+                    color:
+                      totalScore >= 67
+                        ? "hsl(var(--score-green))"
+                        : totalScore >= 35
+                        ? "hsl(var(--score-orange))"
+                        : "hsl(var(--score-red))",
+                  }}
+                >
+                  {Math.round(totalScore)}%
+                </div>
+                <p className="text-xl font-semibold text-foreground">
+                  {totalScore >= 67
+                    ? "Excellent fit with SP_CE!"
+                    : totalScore >= 35
+                    ? "Good potential alignment with SP_CE"
+                    : "Lower fit - Consider reviewing your responses"}
+                </p>
               </div>
-              <p className="text-xl font-semibold text-foreground">
-                {totalScore >= 67
-                  ? "Excellent fit with SP_CE!"
-                  : totalScore >= 35
-                  ? "Good potential alignment with SP_CE"
-                  : "Lower fit - Consider reviewing your responses"}
-              </p>
-              <Button onClick={handleDownloadPDF} size="lg" className="rounded-full mt-4">
+            </div>
+
+            {/* Productivity Gain & Potential Savings */}
+            {calculatedMetrics && (
+              <div className="grid md:grid-cols-2 gap-8">
+                {/* Productivity Gain Slider */}
+                <div className="bg-white rounded-xl border-border border p-8 shadow-lg">
+                  <h3 className="text-xl font-bold text-center text-foreground mb-6">
+                    Productivity Gain
+                  </h3>
+                  <div className="flex flex-col items-center space-y-6">
+                    <div className="text-5xl font-bold text-primary">
+                      {productivityGain}%
+                    </div>
+                    <div className="w-full px-4">
+                      <Slider
+                        value={[productivityGain]}
+                        onValueChange={(value) => setProductivityGain(value[0])}
+                        min={1}
+                        max={50}
+                        step={1}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+                        <span>1%</span>
+                        <span>5%</span>
+                        <span>10%</span>
+                        <span>20%</span>
+                        <span>30%</span>
+                        <span>40%</span>
+                        <span>50%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Potential Savings */}
+                <div className="bg-white rounded-xl border-border border p-8 shadow-lg">
+                  <h3 className="text-xl font-bold text-center text-foreground mb-6">
+                    Potential Savings
+                  </h3>
+                  <div className="flex flex-col items-center justify-center space-y-4">
+                    <div className="text-5xl font-bold" style={{ color: "hsl(var(--score-green))" }}>
+                      {calculatedMetrics.potentialSavings}
+                    </div>
+                    <p className="text-lg font-medium text-muted-foreground">
+                      hours/month
+                    </p>
+                    <p className="text-sm text-muted-foreground text-center">
+                      {calculatedMetrics.pams} PAMs × {productivityGain}% × 165
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Download Button */}
+            <div className="flex justify-center">
+              <Button onClick={handleDownloadPDF} size="lg" className="rounded-full">
                 <Download className="mr-2 h-5 w-5" />
                 Download PDF Report
               </Button>

@@ -7,9 +7,12 @@ interface QuestionItemProps {
   value?: string;
   score?: number;
   onChange: (value: string, score: number) => void;
+  hideScoreIndicator?: boolean;
+  isCalculated?: boolean;
+  calculatedValue?: string;
 }
 
-export const QuestionItem = ({ question, value, score = 0, onChange }: QuestionItemProps) => {
+export const QuestionItem = ({ question, value, score = 0, onChange, hideScoreIndicator = false, isCalculated = false, calculatedValue }: QuestionItemProps) => {
   const handleChange = (selectedValue: string) => {
     const option = question.options.find((opt) => opt.value === selectedValue);
     if (option) {
@@ -27,19 +30,25 @@ export const QuestionItem = ({ question, value, score = 0, onChange }: QuestionI
         <p className="text-sm font-medium text-foreground">{question.text}</p>
       </div>
       <div className="flex items-center gap-3 flex-shrink-0">
-        <Select value={value} onValueChange={handleChange}>
-          <SelectTrigger className="w-[280px]">
-            <SelectValue placeholder={placeholderText} />
-          </SelectTrigger>
-          <SelectContent>
-            {validOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <FitScoreIndicator score={score} className="w-[110px]" />
+        {isCalculated ? (
+          <div className="w-[280px] h-10 px-3 py-2 bg-muted rounded-md border border-border flex items-center justify-start text-sm font-medium">
+            {calculatedValue || "N/A"}
+          </div>
+        ) : (
+          <Select value={value} onValueChange={handleChange}>
+            <SelectTrigger className="w-[280px]">
+              <SelectValue placeholder={placeholderText} />
+            </SelectTrigger>
+            <SelectContent>
+              {validOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+        {!hideScoreIndicator && <FitScoreIndicator score={score} className="w-[110px]" />}
       </div>
     </div>
   );

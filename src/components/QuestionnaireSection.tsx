@@ -11,6 +11,29 @@ interface QuestionnaireSectionProps {
 }
 
 export const QuestionnaireSection = ({ section, answers, onAnswerChange }: QuestionnaireSectionProps) => {
+  // Calculate Partners/PAM ratio
+  const partnersValue = answers.find(a => a.questionId === "partners")?.value;
+  const pamValue = answers.find(a => a.questionId === "pam_count")?.value;
+  
+  const calculatedRatio = useMemo(() => {
+    if (!partnersValue || !pamValue) return null;
+    
+    const getNumericValue = (val: string): number => {
+      if (val.includes("+")) {
+        return parseInt(val.replace("+", ""));
+      }
+      const parts = val.split("-");
+      if (parts.length === 2) {
+        return (parseInt(parts[0]) + parseInt(parts[1])) / 2;
+      }
+      return parseInt(val);
+    };
+    
+    const partners = getNumericValue(partnersValue);
+    const pams = getNumericValue(pamValue);
+    const ratio = Math.round(partners / pams);
+    return { value: `${ratio}:1`, numericValue: ratio };
+  }, [partnersValue, pamValue]);
   const sectionScore = useMemo(() => {
     const sectionAnswers = answers.filter((a) =>
       section.questions.some((q) => q.id === a.questionId)
@@ -43,6 +66,36 @@ export const QuestionnaireSection = ({ section, answers, onAnswerChange }: Quest
         <div className="space-y-0">
           {section.questions.map((question) => {
             const answer = answers.find((a) => a.questionId === question.id);
+            
+            // Special handling for PAM count - hide score indicator
+            if (question.id === "pam_count") {
+              return (
+                <QuestionItem
+                  key={question.id}
+                  question={question}
+                  value={answer?.value}
+                  score={answer?.score}
+                  onChange={(value, score) => onAnswerChange(question.id, value, score)}
+                  hideScoreIndicator={true}
+                />
+              );
+            }
+            
+            // Special handling for Partners/PAM ratio - calculated field
+            if (question.id === "partners_pam_ratio") {
+              return (
+                <QuestionItem
+                  key={question.id}
+                  question={question}
+                  value={calculatedRatio?.value || ""}
+                  score={100}
+                  onChange={() => {}}
+                  isCalculated={true}
+                  calculatedValue={calculatedRatio?.value}
+                />
+              );
+            }
+            
             return (
               <QuestionItem
                 key={question.id}
