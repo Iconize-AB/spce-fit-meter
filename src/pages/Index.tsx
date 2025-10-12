@@ -4,7 +4,8 @@ import { Answer } from "@/types/questionnaire";
 import { QuestionnaireSection } from "@/components/QuestionnaireSection";
 import { Speedometer } from "@/components/Speedometer";
 import { Button } from "@/components/ui/button";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Download } from "lucide-react";
+import jsPDF from "jspdf";
 
 const Index = () => {
   const [answers, setAnswers] = useState<Answer[]>([]);
@@ -33,6 +34,83 @@ const Index = () => {
 
   const handleReset = () => {
     setAnswers([]);
+  };
+
+  const handleDownloadPDF = () => {
+    const pdf = new jsPDF();
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const margin = 20;
+    let yPosition = 20;
+
+    // Title
+    pdf.setFontSize(20);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("SP_CE Fit Assessment Results", margin, yPosition);
+    yPosition += 15;
+
+    // Score
+    pdf.setFontSize(16);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`Overall Fit Score: ${Math.round(totalScore)}%`, margin, yPosition);
+    yPosition += 10;
+
+    // Date
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`Generated: ${new Date().toLocaleDateString()}`, margin, yPosition);
+    yPosition += 15;
+
+    // Sections and Questions
+    questionnaireData.sections.forEach((section) => {
+      // Check if we need a new page
+      if (yPosition > 250) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+
+      // Section title
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text(section.title, margin, yPosition);
+      yPosition += 8;
+
+      section.questions.forEach((question) => {
+        const answer = answers.find((a) => a.questionId === question.id);
+
+        // Check if we need a new page
+        if (yPosition > 260) {
+          pdf.addPage();
+          yPosition = 20;
+        }
+
+        // Question
+        pdf.setFontSize(11);
+        pdf.setFont("helvetica", "bold");
+        const questionLines = pdf.splitTextToSize(question.text, pageWidth - 2 * margin);
+        pdf.text(questionLines, margin + 5, yPosition);
+        yPosition += questionLines.length * 6;
+
+        // Answer
+        pdf.setFont("helvetica", "normal");
+        if (answer) {
+          const answerText = `Answer: ${answer.value} (Score: ${answer.score})`;
+          const answerLines = pdf.splitTextToSize(answerText, pageWidth - 2 * margin);
+          pdf.text(answerLines, margin + 5, yPosition);
+          yPosition += answerLines.length * 6;
+        } else {
+          pdf.setTextColor(150, 150, 150);
+          pdf.text("Not answered", margin + 5, yPosition);
+          pdf.setTextColor(0, 0, 0);
+          yPosition += 6;
+        }
+
+        yPosition += 5;
+      });
+
+      yPosition += 5;
+    });
+
+    pdf.save("space-fit-assessment.pdf");
   };
 
   return (
@@ -96,6 +174,12 @@ const Index = () => {
               Your SP<span className="text-primary">_</span>CE Score
             </h2>
             <Speedometer score={totalScore} />
+            <div className="flex justify-center mt-6">
+              <Button onClick={handleDownloadPDF} size="lg" className="rounded-full">
+                <Download className="mr-2 h-5 w-5" />
+                Download PDF Report
+              </Button>
+            </div>
           </div>
         )}
 
