@@ -76,17 +76,52 @@ const Index = () => {
     pdf.text("SP_CE Fit Assessment Results", margin, yPosition);
     yPosition += 15;
 
-    // Score
-    pdf.setFontSize(16);
-    pdf.setTextColor(0, 0, 0);
-    pdf.text(`Overall Fit Score: ${Math.round(totalScore)}%`, margin, yPosition);
-    yPosition += 10;
-
     // Date
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
     pdf.text(`Generated: ${new Date().toLocaleDateString()}`, margin, yPosition);
     yPosition += 15;
+
+    // Summary Box - Fit Score
+    pdf.setFontSize(14);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Your SP_CE Fit Score", margin, yPosition);
+    yPosition += 8;
+    pdf.setFontSize(24);
+    const scoreColor = totalScore >= 67 ? [34, 197, 94] : totalScore >= 35 ? [249, 115, 22] : [239, 68, 68];
+    pdf.setTextColor(scoreColor[0], scoreColor[1], scoreColor[2]);
+    pdf.text(`${Math.round(totalScore)}%`, margin, yPosition);
+    pdf.setTextColor(0, 0, 0);
+    yPosition += 15;
+
+    // Summary Box - Productivity Gain & Potential Savings
+    if (calculatedMetrics) {
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Productivity Gain", margin, yPosition);
+      yPosition += 8;
+      pdf.setFontSize(20);
+      pdf.setTextColor(109, 40, 217);
+      pdf.text(`${productivityGain}%`, margin, yPosition);
+      pdf.setTextColor(0, 0, 0);
+      yPosition += 15;
+
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Potential Savings", margin, yPosition);
+      yPosition += 8;
+      pdf.setFontSize(20);
+      pdf.setTextColor(34, 197, 94);
+      pdf.text(`${calculatedMetrics.potentialSavings} hours/month`, margin, yPosition);
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+      yPosition += 7;
+      pdf.text(`${calculatedMetrics.pams} PAMs × ${productivityGain}% × 165`, margin, yPosition);
+      yPosition += 15;
+    }
+
+    yPosition += 5;
 
     // Sections and Questions
     questionnaireData.sections.forEach((section) => {
