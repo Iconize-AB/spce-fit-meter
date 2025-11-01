@@ -52,17 +52,17 @@ export const QuestionnaireSection = ({ section, answers, onAnswerChange }: Quest
   return (
     <Card className="overflow-hidden">
       <CardHeader className="bg-muted/30">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <CardTitle className="text-xl font-bold text-foreground">{section.title}</CardTitle>
+            <CardTitle className="text-lg sm:text-xl font-bold text-foreground">{section.title}</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
               {answeredCount} of {section.questions.length} questions answered
             </p>
           </div>
-          <FitScoreIndicator score={sectionScore} className="text-sm" />
+          <FitScoreIndicator score={sectionScore} className="text-sm self-start sm:self-auto" />
         </div>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="pt-4 sm:pt-6">
         <div className="space-y-0">
           {section.questions.map((question) => {
             const answer = answers.find((a) => a.questionId === question.id);

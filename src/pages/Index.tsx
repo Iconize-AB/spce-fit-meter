@@ -180,18 +180,18 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-white border-b border-border sticky top-0 z-10 shadow-sm">
-        <div className="max-w-6xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
                 SP<span className="text-primary">_</span>CE Fit Assessment
               </h1>
-              <p className="text-muted-foreground mt-1">
+              <p className="text-muted-foreground mt-1 text-sm sm:text-base">
                 Answer {totalQuestions} questions to calculate your fit score
               </p>
             </div>
             {answers.length > 0 && (
-              <Button onClick={handleReset} variant="outline" size="sm">
+              <Button onClick={handleReset} variant="outline" size="sm" className="self-start sm:self-auto">
                 <RotateCcw className="mr-2 h-4 w-4" />
                 Reset
               </Button>
@@ -201,10 +201,10 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-6 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Progress indicator */}
-        <div className="mb-8 p-4 bg-muted/30 rounded-lg border border-border">
-          <div className="flex items-center justify-between mb-2">
+        <div className="mb-6 sm:mb-8 p-3 sm:p-4 bg-muted/30 rounded-lg border border-border">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
             <span className="text-sm font-medium text-foreground">Overall Progress</span>
             <span className="text-sm text-muted-foreground">
               {answers.length} / {totalQuestions} questions answered
@@ -219,7 +219,7 @@ const Index = () => {
         </div>
 
         {/* Sections */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {questionnaireData.sections.map((section) => (
             <QuestionnaireSection
               key={section.id}
@@ -232,15 +232,15 @@ const Index = () => {
 
         {/* Score Display */}
         {answers.length > 0 && (
-          <div className="mt-12 space-y-8">
+          <div className="mt-8 sm:mt-12 space-y-6 sm:space-y-8">
             {/* Main Score */}
-            <div className="bg-white rounded-xl border-border border p-12 shadow-lg">
-              <h2 className="text-2xl font-bold text-center text-foreground mb-8">
+            <div className="bg-white rounded-xl border-border border p-6 sm:p-8 md:p-12 shadow-lg">
+              <h2 className="text-xl sm:text-2xl font-bold text-center text-foreground mb-6 sm:mb-8">
                 Your SP<span className="text-primary">_</span>CE Fit Score
               </h2>
-              <div className="flex flex-col items-center justify-center space-y-6">
+              <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-6">
                 <div
-                  className="text-8xl font-bold"
+                  className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold"
                   style={{
                     color:
                       totalScore >= 67
@@ -252,7 +252,7 @@ const Index = () => {
                 >
                   {Math.round(totalScore)}%
                 </div>
-                <p className="text-xl font-semibold text-foreground">
+                <p className="text-base sm:text-lg md:text-xl font-semibold text-foreground text-center px-4">
                   {totalScore >= 67
                     ? "Excellent fit with SP_CE!"
                     : totalScore >= 35
@@ -264,17 +264,17 @@ const Index = () => {
 
             {/* Productivity Gain & Potential Savings */}
             {calculatedMetrics && (
-              <div className="grid md:grid-cols-2 gap-8">
+              <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
                 {/* Productivity Gain Slider */}
-                <div className="bg-white rounded-xl border-border border p-8 shadow-lg">
-                  <h3 className="text-xl font-bold text-center text-foreground mb-6">
+                <div className="bg-white rounded-xl border-border border p-6 sm:p-8 shadow-lg">
+                  <h3 className="text-lg sm:text-xl font-bold text-center text-foreground mb-4 sm:mb-6">
                     Productivity Gain
                   </h3>
-                  <div className="flex flex-col items-center space-y-6">
-                    <div className="text-5xl font-bold text-primary">
+                  <div className="flex flex-col items-center space-y-4 sm:space-y-6">
+                    <div className="text-4xl sm:text-5xl font-bold text-primary">
                       {productivityGain}%
                     </div>
-                    <div className="w-full px-4">
+                    <div className="w-full px-2 sm:px-4">
                       <Slider
                         value={[productivityGain]}
                         onValueChange={(value) => setProductivityGain(value[0])}
@@ -285,11 +285,11 @@ const Index = () => {
                       />
                       <div className="flex justify-between mt-2 text-xs text-muted-foreground">
                         <span>1%</span>
-                        <span>5%</span>
+                        <span className="hidden sm:inline">5%</span>
                         <span>10%</span>
-                        <span>20%</span>
-                        <span>30%</span>
-                        <span>40%</span>
+                        <span className="hidden sm:inline">20%</span>
+                        <span className="hidden md:inline">30%</span>
+                        <span className="hidden sm:inline">40%</span>
                         <span>50%</span>
                       </div>
                     </div>
@@ -297,18 +297,18 @@ const Index = () => {
                 </div>
 
                 {/* Potential Savings */}
-                <div className="bg-white rounded-xl border-border border p-8 shadow-lg">
-                  <h3 className="text-xl font-bold text-center text-foreground mb-6">
+                <div className="bg-white rounded-xl border-border border p-6 sm:p-8 shadow-lg">
+                  <h3 className="text-lg sm:text-xl font-bold text-center text-foreground mb-4 sm:mb-6">
                     Potential Savings
                   </h3>
-                  <div className="flex flex-col items-center justify-center space-y-4">
-                    <div className="text-5xl font-bold" style={{ color: "hsl(var(--score-green))" }}>
+                  <div className="flex flex-col items-center justify-center space-y-3 sm:space-y-4">
+                    <div className="text-4xl sm:text-5xl font-bold" style={{ color: "hsl(var(--score-green))" }}>
                       {calculatedMetrics.potentialSavings}
                     </div>
-                    <p className="text-lg font-medium text-muted-foreground">
+                    <p className="text-base sm:text-lg font-medium text-muted-foreground">
                       hours/month
                     </p>
-                    <p className="text-sm text-muted-foreground text-center">
+                    <p className="text-xs sm:text-sm text-muted-foreground text-center px-2">
                       {calculatedMetrics.pams} PAMs × {productivityGain}% × 165
                     </p>
                   </div>
@@ -318,7 +318,7 @@ const Index = () => {
 
             {/* Download Button */}
             <div className="flex justify-center">
-              <Button onClick={handleDownloadPDF} size="lg" className="rounded-full">
+              <Button onClick={handleDownloadPDF} size="lg" className="rounded-full w-full sm:w-auto">
                 <Download className="mr-2 h-5 w-5" />
                 Download PDF Report
               </Button>
@@ -328,8 +328,8 @@ const Index = () => {
 
         {/* Empty state */}
         {answers.length === 0 && (
-          <div className="mt-12 text-center p-12 bg-muted/20 rounded-xl border border-dashed border-border">
-            <p className="text-lg text-muted-foreground">
+          <div className="mt-8 sm:mt-12 text-center p-6 sm:p-12 bg-muted/20 rounded-xl border border-dashed border-border">
+            <p className="text-base sm:text-lg text-muted-foreground">
               Start answering questions to see your SP_CE fit score
             </p>
           </div>
@@ -337,8 +337,8 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="mt-16 py-6 border-t border-border">
-        <div className="max-w-6xl mx-auto px-6 text-center text-sm text-muted-foreground">
+      <footer className="mt-12 sm:mt-16 py-4 sm:py-6 border-t border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center text-sm text-muted-foreground">
           <p>Powered by SP_CE Partner Portal</p>
         </div>
       </footer>
